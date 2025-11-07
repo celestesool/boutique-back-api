@@ -1,5 +1,6 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Order } from '../../orders/entities/order.entity';
 
 @ObjectType()
 @Entity('users')
@@ -31,4 +32,8 @@ export class User {
   @Field()
   @CreateDateColumn()
   createdAt: Date;
+
+  @Field(() => [Order], { nullable: true })
+  @OneToMany(() => Order, (order) => order.user)
+  orders?: Order[];
 }

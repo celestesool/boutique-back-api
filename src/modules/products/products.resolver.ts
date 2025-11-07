@@ -5,6 +5,9 @@ import { Product } from './entities/product.entity';
 import { ProductsService } from './products.service';
 import { CreateProductInput } from './dto/create-product.input';
 import { UpdateProductInput } from './dto/update-product.input';
+import { PaginationInput } from '../../common/dto/pagination.input';
+import { ProductFiltersInput } from './dto/product-filters.input';
+import { PaginatedProductsResponse } from './dto/paginated-products.response';
 import { AuthService } from '../auth/auth.service';
 import { User } from '../auth/entities/user.entity';
 
@@ -39,9 +42,17 @@ export class ProductsResolver {
     }
   }
 
-  @Query(() => [Product], { description: 'Obtener todos los productos' })
+  @Query(() => [Product], { description: 'Obtener todos los productos (sin paginación)' })
   async getProducts(): Promise<Product[]> {
     return this.productsService.findAll();
+  }
+
+  @Query(() => PaginatedProductsResponse, { description: 'Obtener productos paginados con filtros' })
+  async getProductsPaginated(
+    @Args('pagination', { type: () => PaginationInput, nullable: true }) pagination: PaginationInput = new PaginationInput(),
+    @Args('filters', { type: () => ProductFiltersInput, nullable: true }) filters: ProductFiltersInput = new ProductFiltersInput(),
+  ): Promise<PaginatedProductsResponse> {
+    return this.productsService.findAllPaginated(pagination, filters);
   }
 
   @Query(() => Product, { nullable: true })

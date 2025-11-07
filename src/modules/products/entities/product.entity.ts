@@ -26,6 +26,10 @@ export class Product {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
+  categoria?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   imagen_url: string;
 
   @Field()
