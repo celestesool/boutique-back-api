@@ -1,0 +1,481 @@
+# ========================================
+#  DATOS DE PRUEBA - BOUTIQUE API
+# ========================================
+# Instrucciones:
+# 1. Abre http://localhost:3001/graphql
+# 2. Copia cada mutation (una a la vez)
+# 3. Pega en el panel izquierdo
+# 4. Click en el botón "Play" ▶️
+# 5. Guarda los IDs que te devuelven (los necesitarás para productos)
+# ========================================
+
+# ========================================
+# PASO 1: CREAR CATEGORÍAS
+# ========================================
+
+mutation CrearCategorias {
+  camisetas: createCategoria(input: {
+    nombre: "Camisetas"
+    descripcion: "Camisetas de todo tipo: deportivas, casuales, formales"
+    activo: true
+  }) {
+    id
+    nombre
+    descripcion
+  }
+  
+  pantalones: createCategoria(input: {
+    nombre: "Pantalones"
+    descripcion: "Pantalones casuales, deportivos y formales"
+    activo: true
+  }) {
+    id
+    nombre
+  }
+  
+  zapatos: createCategoria(input: {
+    nombre: "Calzado"
+    descripcion: "Zapatos deportivos, casuales y formales"
+    activo: true
+  }) {
+    id
+    nombre
+  }
+  
+  accesorios: createCategoria(input: {
+    nombre: "Accesorios"
+    descripcion: "Gorras, cinturones, bolsos"
+    activo: true
+  }) {
+    id
+    nombre
+  }
+}
+
+# ========================================
+# PASO 2: CREAR MARCAS
+# ========================================
+
+mutation CrearMarcas {
+  nike: createMarca(input: {
+    nombre: "Nike"
+    descripcion: "Just Do It - Ropa y calzado deportivo de alta calidad"
+    activo: true
+  }) {
+    id
+    nombre
+  }
+  
+  adidas: createMarca(input: {
+    nombre: "Adidas"
+    descripcion: "Impossible is Nothing - Marca deportiva alemana"
+    activo: true
+  }) {
+    id
+    nombre
+  }
+  
+  puma: createMarca(input: {
+    nombre: "Puma"
+    descripcion: "Forever Faster - Ropa deportiva y lifestyle"
+    activo: true
+  }) {
+    id
+    nombre
+  }
+  
+  underArmour: createMarca(input: {
+    nombre: "Under Armour"
+    descripcion: "Ropa deportiva de alto rendimiento"
+    activo: true
+  }) {
+    id
+    nombre
+  }
+  
+  zara: createMarca(input: {
+    nombre: "Zara"
+    descripcion: "Moda casual y contemporánea"
+    activo: true
+  }) {
+    id
+    nombre
+  }
+}
+
+# ========================================
+#  PASO 3: CREAR COLORES
+# ========================================
+
+mutation CrearColores {
+  negro: createColor(input: {
+    nombre: "Negro"
+    codigoHex: "#000000"
+    activo: true
+  }) {
+    id
+    nombre
+    codigoHex
+  }
+  
+  blanco: createColor(input: {
+    nombre: "Blanco"
+    codigoHex: "#FFFFFF"
+    activo: true
+  }) {
+    id
+    nombre
+    codigoHex
+  }
+  
+  rojo: createColor(input: {
+    nombre: "Rojo"
+    codigoHex: "#FF0000"
+    activo: true
+  }) {
+    id
+    nombre
+    codigoHex
+  }
+  
+  azul: createColor(input: {
+    nombre: "Azul"
+    codigoHex: "#0000FF"
+    activo: true
+  }) {
+    id
+    nombre
+    codigoHex
+  }
+  
+  verde: createColor(input: {
+    nombre: "Verde"
+    codigoHex: "#00FF00"
+    activo: true
+  }) {
+    id
+    nombre
+    codigoHex
+  }
+  
+  gris: createColor(input: {
+    nombre: "Gris"
+    codigoHex: "#808080"
+    activo: true
+  }) {
+    id
+    nombre
+    codigoHex
+  }
+  
+  amarillo: createColor(input: {
+    nombre: "Amarillo"
+    codigoHex: "#FFFF00"
+    activo: true
+  }) {
+    id
+    nombre
+    codigoHex
+  }
+  
+  rosa: createColor(input: {
+    nombre: "Rosa"
+    codigoHex: "#FFC0CB"
+    activo: true
+  }) {
+    id
+    nombre
+    codigoHex
+  }
+}
+
+# ========================================
+#  PASO 4: CREAR TALLAS
+# ========================================
+
+mutation CrearTallas {
+  xs: createTalla(input: {
+    nombre: "XS"
+    medida: "Extra Small"
+    activo: true
+  }) {
+    id
+    nombre
+    medida
+  }
+  
+  s: createTalla(input: {
+    nombre: "S"
+    medida: "Small"
+    activo: true
+  }) {
+    id
+    nombre
+  }
+  
+  m: createTalla(input: {
+    nombre: "M"
+    medida: "Medium"
+    activo: true
+  }) {
+    id
+    nombre
+  }
+  
+  l: createTalla(input: {
+    nombre: "L"
+    medida: "Large"
+    activo: true
+  }) {
+    id
+    nombre
+  }
+  
+  xl: createTalla(input: {
+    nombre: "XL"
+    medida: "Extra Large"
+    activo: true
+  }) {
+    id
+    nombre
+  }
+  
+  xxl: createTalla(input: {
+    nombre: "XXL"
+    medida: "Double Extra Large"
+    activo: true
+  }) {
+    id
+    nombre
+  }
+}
+
+# ========================================
+# PASO 5: CREAR DESCUENTOS (OPCIONAL)
+# ========================================
+
+mutation CrearDescuentos {
+  black_friday: createDescuento(input: {
+    nombre: "Black Friday"
+    descripcion: "Descuento especial de Black Friday"
+    porcentaje: 25.0
+    fechaInicio: "2025-11-20T00:00:00Z"
+    fechaFin: "2025-11-30T23:59:59Z"
+    activo: true
+  }) {
+    id
+    nombre
+    porcentaje
+  }
+  
+  verano: createDescuento(input: {
+    nombre: "Verano 2025"
+    descripcion: "Descuento de temporada verano"
+    porcentaje: 15.0
+    fechaInicio: "2025-12-01T00:00:00Z"
+    fechaFin: "2026-02-28T23:59:59Z"
+    activo: true
+  }) {
+    id
+    nombre
+    porcentaje
+  }
+}
+
+# ========================================
+# PASO 6: CREAR CATEGORÍAS DE COLORES (OPCIONAL)
+# ========================================
+
+mutation CrearCategoriasColores {
+  basicos: createCategoriaColor(input: {
+    nombre: "Colores Básicos"
+    descripcion: "Colores neutros y versátiles"
+    activo: true
+  }) {
+    id
+    nombre
+  }
+  
+  vibrantes: createCategoriaColor(input: {
+    nombre: "Colores Vibrantes"
+    descripcion: "Colores llamativos y energéticos"
+    activo: true
+  }) {
+    id
+    nombre
+  }
+}
+
+# ========================================
+#  PASO 7: CREAR PRODUCTOS (EJEMPLOS)
+# ========================================
+#  IMPORTANTE: Reemplaza los IDs con los que obtuviste en los pasos anteriores
+# Ejemplo: categoriaId: "abc-123-def" (el UUID que te dio createCategoria)
+
+# EJEMPLO 1: Camiseta Nike
+mutation CrearProducto1 {
+  createProduct(input: {
+    nombre: "Camiseta Nike Dri-FIT"
+    descripcion: "Camiseta deportiva con tecnología Dri-FIT para mantenerte seco y cómodo durante el entrenamiento"
+    precio: 39.99
+    stock: 50
+    popularidad: 10
+    imagen_url: "https://via.placeholder.com/400x400.png?text=Nike+Dri-FIT"
+    categoriaId: "REEMPLAZA_CON_ID_DE_CAMISETAS"
+    marcaId: "REEMPLAZA_CON_ID_DE_NIKE"
+    coloresIds: ["REEMPLAZA_CON_ID_NEGRO", "REEMPLAZA_CON_ID_BLANCO", "REEMPLAZA_CON_ID_AZUL"]
+    tallasIds: ["REEMPLAZA_CON_ID_S", "REEMPLAZA_CON_ID_M", "REEMPLAZA_CON_ID_L", "REEMPLAZA_CON_ID_XL"]
+  }) {
+    id
+    nombre
+    precio
+    popularidad
+    fecha_agregado
+    categoriaRelacion { id nombre }
+    marca { id nombre }
+    colores { id nombre codigoHex }
+    tallas { id nombre }
+  }
+}
+
+# EJEMPLO 2: Pantalón Adidas
+mutation CrearProducto2 {
+  createProduct(input: {
+    nombre: "Pantalón Adidas Tiro 21"
+    descripcion: "Pantalón de entrenamiento con ajuste cómodo y bolsillos con cierre"
+    precio: 49.99
+    stock: 30
+    popularidad: 8
+    imagen_url: "https://via.placeholder.com/400x400.png?text=Adidas+Tiro+21"
+    categoriaId: "REEMPLAZA_CON_ID_DE_PANTALONES"
+    marcaId: "REEMPLAZA_CON_ID_DE_ADIDAS"
+    descuentoId: "REEMPLAZA_CON_ID_DESCUENTO_SI_QUIERES"
+    coloresIds: ["REEMPLAZA_CON_ID_NEGRO", "REEMPLAZA_CON_ID_GRIS"]
+    tallasIds: ["REEMPLAZA_CON_ID_M", "REEMPLAZA_CON_ID_L", "REEMPLAZA_CON_ID_XL"]
+  }) {
+    id
+    nombre
+    precio
+    popularidad
+    descuento { nombre porcentaje }
+    marca { nombre }
+  }
+}
+
+# ========================================
+# CONSULTAS PARA VERIFICAR
+# ========================================
+
+# Ver todas las categorías
+query ObtenerCategorias {
+  getCategorias {
+    id
+    nombre
+    descripcion
+    activo
+  }
+}
+
+# Ver todas las marcas
+query ObtenerMarcas {
+  getMarcas {
+    id
+    nombre
+    descripcion
+  }
+}
+
+# Ver todos los colores
+query ObtenerColores {
+  getColores {
+    id
+    nombre
+    codigoHex
+  }
+}
+
+# Ver todas las tallas
+query ObtenerTallas {
+  getTallas {
+    id
+    nombre
+    medida
+  }
+}
+
+# Ver todos los productos
+query ObtenerProductos {
+  getProducts {
+    id
+    nombre
+    precio
+    stock
+    popularidad
+    fecha_agregado
+    categoriaRelacion { nombre }
+    marca { nombre }
+    colores { nombre codigoHex }
+    tallas { nombre }
+    descuento { nombre porcentaje }
+  }
+}
+
+# ========================================
+#  NOTAS IMPORTANTES
+# ========================================
+# 1. Ejecuta las mutations EN ORDEN (Paso 1 → Paso 7)
+# 2. GUARDA los IDs que te devuelven las mutations
+# 3. Para crear productos, REEMPLAZA los placeholders con IDs reales
+# 4. Los productos requieren AUTENTICACIÓN JWT
+#    - Primero debes hacer login y obtener el token
+#    - Luego agrégalo en HTTP Headers:
+#      {
+#        "Authorization": "Bearer TU_TOKEN_AQUI"
+#      }
+# 5. Si no tienes usuario, créalo primero:
+
+mutation CrearUsuarioAdmin {
+  register(input: {
+    nombre: "Admin"
+    email: "admin@boutique.com"
+    password: "Admin123!"
+    rol: ADMIN
+  }) {
+    access_token
+    user {
+      id
+      nombre
+      email
+      rol
+    }
+  }
+}
+
+# Luego haz login para obtener el token:
+mutation LoginAdmin {
+  login(input: {
+    email: "admin@boutique.com"
+    password: "Admin123!"
+  }) {
+    access_token
+    user {
+      id
+      nombre
+      rol
+    }
+  }
+}
+
+# ========================================
+# CHECKLIST
+# ========================================
+# □ Servidor corriendo en http://localhost:3001/graphql
+# □ Base de datos limpia y conectada
+# □ Usuario admin creado y token obtenido
+# □ Categorías creadas (guarda los IDs)
+# □ Marcas creadas (guarda los IDs)
+# □ Colores creados (guarda los IDs)
+# □ Tallas creadas (guarda los IDs)
+# □ Descuentos creados (opcional)
+# □ Productos creados con IDs correctos
+# □ Token JWT agregado en HTTP Headers para mutations de productos

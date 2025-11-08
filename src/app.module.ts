@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ProductsModule } from './modules/products/products.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { UsersModule } from './modules/users/users.module';
+import { CatalogModule } from './modules/catalog/catalog.module';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { UsersModule } from './modules/users/users.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       entities: [join(__dirname, '/**/*.entity{.ts,.js}')],
-      synchronize: true,
+      synchronize: true, // ✅ Recreará automáticamente todas las tablas
       logging: false,
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -38,6 +39,7 @@ import { UsersModule } from './modules/users/users.module';
     ProductsModule,
     OrdersModule,
     UsersModule,
+    CatalogModule,
   ],
 })
 export class AppModule {}

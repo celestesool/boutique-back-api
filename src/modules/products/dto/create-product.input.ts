@@ -1,5 +1,5 @@
 import { InputType, Field, Float } from '@nestjs/graphql';
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, MaxLength, Min, MinLength } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, MaxLength, Min, MinLength, IsUUID, IsArray } from 'class-validator';
 
 @InputType()
 export class CreateProductInput {
@@ -39,4 +39,40 @@ export class CreateProductInput {
   @IsOptional()
   @IsUrl({}, { message: 'Debe ser una URL válida' })
   imagen_url?: string;
+
+  @Field({ nullable: true, defaultValue: 0 })
+  @IsOptional()
+  @IsNumber({}, { message: 'La popularidad debe ser un número' })
+  @Min(0, { message: 'La popularidad no puede ser negativa' })
+  popularidad?: number;
+
+  // ==================== IDs PARA RELACIONES ====================
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsUUID('4', { message: 'La categoría debe ser un UUID válido' })
+  categoriaId?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsUUID('4', { message: 'La marca debe ser un UUID válido' })
+  marcaId?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsUUID('4', { message: 'El descuento debe ser un UUID válido' })
+  descuentoId?: string;
+
+  @Field(() => [String], { nullable: true })
+  @IsOptional()
+  @IsArray({ message: 'Los colores deben ser un arreglo' })
+  @IsUUID('4', { each: true, message: 'Cada color debe ser un UUID válido' })
+  coloresIds?: string[];
+
+  @Field(() => [String], { nullable: true })
+  @IsOptional()
+  @IsArray({ message: 'Las tallas deben ser un arreglo' })
+  @IsUUID('4', { each: true, message: 'Cada talla debe ser un UUID válido' })
+  tallasIds?: string[];
 }
+

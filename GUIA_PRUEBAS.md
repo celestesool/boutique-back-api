@@ -14,11 +14,18 @@
 1. [Autenticacion](#1-autenticacion)
 2. [Gestion de Usuarios](#2-gestion-de-usuarios)
 3. [Gestion de Productos](#3-gestion-de-productos)
-4. [Gestion de Ordenes](#4-gestion-de-ordenes)
-5. [Paginacion y Filtros](#5-paginacion-y-filtros)
-6. [Validaciones](#6-validaciones)
-7. [Casos de Prueba Completos](#7-casos-de-prueba-completos)
-8. [Matriz de Permisos](#8-matriz-de-permisos)
+4. [Gestion de Catalogo](#4-gestion-de-catalogo)
+   - [4.1 Categorias](#41-categorias)
+   - [4.2 Marcas](#42-marcas)
+   - [4.3 Colores](#43-colores)
+   - [4.4 Tallas](#44-tallas)
+   - [4.5 Descuentos](#45-descuentos)
+   - [4.6 Categorias de Colores](#46-categorias-de-colores)
+5. [Gestion de Ordenes](#5-gestion-de-ordenes)
+6. [Paginacion y Filtros](#6-paginacion-y-filtros)
+7. [Validaciones](#7-validaciones)
+8. [Casos de Prueba Completos](#8-casos-de-prueba-completos)
+9. [Matriz de Permisos](#9-matriz-de-permisos)
 
 ---
 
@@ -411,9 +418,730 @@ mutation {
 
 ---
 
-## 4. GESTION DE ORDENES
+### 3.6 Crear Producto con Relaciones
 
-### 4.1 Crear Orden
+**Mutation Completa:**
+```graphql
+mutation {
+  createProduct(input: {
+    nombre: "Camiseta Nike Deportiva"
+    descripcion: "Camiseta deportiva de alta calidad para entrenamiento"
+    precio: 49.99
+    stock: 100
+    categoria: "Ropa Deportiva"
+    imagen_url: "https://example.com/camiseta-nike.jpg"
+    categoriaId: "uuid-de-categoria-ropa-deportiva"
+    marcaId: "uuid-de-marca-nike"
+    descuentoId: "uuid-de-descuento-verano"
+    coloresIds: ["uuid-color-rojo", "uuid-color-azul", "uuid-color-negro"]
+    tallasIds: ["uuid-talla-s", "uuid-talla-m", "uuid-talla-l", "uuid-talla-xl"]
+  }) {
+    id
+    nombre
+    precio
+    stock
+    categoriaRelacion {
+      id
+      nombre
+    }
+    marca {
+      id
+      nombre
+    }
+    descuento {
+      id
+      nombre
+      porcentaje
+    }
+    colores {
+      id
+      nombre
+      codigoHex
+    }
+    tallas {
+      id
+      nombre
+      medida
+    }
+  }
+}
+```
+
+**Nota:** Todas las relaciones son opcionales. Puedes crear un producto sin ninguna relacion, o solo con algunas.
+
+**Ejemplo sin relaciones:**
+```graphql
+mutation {
+  createProduct(input: {
+    nombre: "Producto Simple"
+    descripcion: "Producto sin relaciones"
+    precio: 29.99
+    stock: 50
+  }) {
+    id
+    nombre
+    precio
+  }
+}
+```
+
+---
+
+### 3.7 Consultar Producto con Relaciones
+
+**Query:**
+```graphql
+query {
+  getProduct(id: "uuid-del-producto") {
+    id
+    nombre
+    descripcion
+    precio
+    stock
+    categoria
+    imagen_url
+    activo
+    categoriaRelacion {
+      id
+      nombre
+      descripcion
+    }
+    marca {
+      id
+      nombre
+      descripcion
+    }
+    descuento {
+      id
+      nombre
+      porcentaje
+      fechaInicio
+      fechaFin
+      activo
+    }
+    colores {
+      id
+      nombre
+      codigoHex
+    }
+    tallas {
+      id
+      nombre
+      medida
+    }
+    createdAt
+  }
+}
+```
+
+---
+
+### 3.8 Actualizar Producto con Relaciones
+
+**Mutation:**
+```graphql
+mutation {
+  updateProduct(id: "uuid-del-producto", input: {
+    precio: 39.99
+    marcaId: "uuid-de-nueva-marca"
+    coloresIds: ["uuid-color-verde", "uuid-color-amarillo"]
+  }) {
+    id
+    nombre
+    precio
+    marca {
+      nombre
+    }
+    colores {
+      nombre
+      codigoHex
+    }
+  }
+}
+```
+
+**Nota:** Para remover una relacion opcional, envia `null`:
+```graphql
+mutation {
+  updateProduct(id: "uuid-del-producto", input: {
+    descuentoId: null
+  }) {
+    id
+    descuento {
+      id
+    }
+  }
+}
+```
+
+---
+
+## 4. GESTION DE CATALOGO
+
+### 4.1 CATEGORIAS
+
+#### 4.1.1 Listar Categorias
+
+**Query:**
+```graphql
+query {
+  getCategorias {
+    id
+    nombre
+    descripcion
+    activo
+    createdAt
+  }
+}
+```
+
+**Permisos:** Publico
+
+#### 4.1.2 Obtener Categoria por ID
+
+**Query:**
+```graphql
+query {
+  getCategoria(id: "uuid-de-la-categoria") {
+    id
+    nombre
+    descripcion
+    activo
+    productos {
+      id
+      nombre
+      precio
+    }
+  }
+}
+```
+
+#### 4.1.3 Crear Categoria
+
+**Mutation:**
+```graphql
+mutation {
+  crearCategoria(input: {
+    nombre: "Ropa Deportiva"
+    descripcion: "Categoria para ropa deportiva y atletica"
+    activo: true
+  }) {
+    id
+    nombre
+    descripcion
+    activo
+  }
+}
+```
+
+**Validaciones:**
+- Nombre: 2-100 caracteres (requerido, unico)
+- Descripcion: maximo 500 caracteres (opcional)
+- Activo: booleano (opcional, default: true)
+
+#### 4.1.4 Actualizar Categoria
+
+**Mutation:**
+```graphql
+mutation {
+  actualizarCategoria(id: "uuid-de-la-categoria", input: {
+    nombre: "Ropa Casual"
+    descripcion: "Categoria actualizada"
+    activo: false
+  }) {
+    id
+    nombre
+    descripcion
+    activo
+  }
+}
+```
+
+#### 4.1.5 Eliminar Categoria
+
+**Mutation:**
+```graphql
+mutation {
+  eliminarCategoria(id: "uuid-de-la-categoria")
+}
+```
+
+**Respuesta esperada:** `true`
+
+---
+
+### 4.2 MARCAS
+
+#### 4.2.1 Listar Marcas
+
+**Query:**
+```graphql
+query {
+  getMarcas {
+    id
+    nombre
+    descripcion
+    activo
+    createdAt
+  }
+}
+```
+
+**Permisos:** Publico
+
+#### 4.2.2 Obtener Marca por ID
+
+**Query:**
+```graphql
+query {
+  getMarca(id: "uuid-de-la-marca") {
+    id
+    nombre
+    descripcion
+    activo
+    productos {
+      id
+      nombre
+      precio
+    }
+  }
+}
+```
+
+#### 4.2.3 Crear Marca
+
+**Mutation:**
+```graphql
+mutation {
+  crearMarca(input: {
+    nombre: "Nike"
+    descripcion: "Marca deportiva internacional"
+    activo: true
+  }) {
+    id
+    nombre
+    descripcion
+    activo
+  }
+}
+```
+
+**Validaciones:**
+- Nombre: 2-100 caracteres (requerido, unico)
+- Descripcion: maximo 500 caracteres (opcional)
+- Activo: booleano (opcional, default: true)
+
+#### 4.2.4 Actualizar Marca
+
+**Mutation:**
+```graphql
+mutation {
+  actualizarMarca(id: "uuid-de-la-marca", input: {
+    nombre: "Nike Sportswear"
+    descripcion: "Marca actualizada"
+  }) {
+    id
+    nombre
+    descripcion
+  }
+}
+```
+
+#### 4.2.5 Eliminar Marca
+
+**Mutation:**
+```graphql
+mutation {
+  eliminarMarca(id: "uuid-de-la-marca")
+}
+```
+
+---
+
+### 4.3 COLORES
+
+#### 4.3.1 Listar Colores
+
+**Query:**
+```graphql
+query {
+  getColores {
+    id
+    nombre
+    codigoHex
+    activo
+    createdAt
+  }
+}
+```
+
+**Permisos:** Publico
+
+#### 4.3.2 Obtener Color por ID
+
+**Query:**
+```graphql
+query {
+  getColor(id: "uuid-del-color") {
+    id
+    nombre
+    codigoHex
+    activo
+  }
+}
+```
+
+#### 4.3.3 Crear Color
+
+**Mutation:**
+```graphql
+mutation {
+  crearColor(input: {
+    nombre: "Rojo Carmesi"
+    codigoHex: "#DC143C"
+    activo: true
+  }) {
+    id
+    nombre
+    codigoHex
+    activo
+  }
+}
+```
+
+**Validaciones:**
+- Nombre: 2-50 caracteres (requerido, unico)
+- codigoHex: formato hexadecimal valido #FFFFFF o #FFF (requerido)
+- Activo: booleano (opcional, default: true)
+
+**Ejemplos de codigos hex validos:**
+- `#FF5733` (6 digitos)
+- `#F57` (3 digitos)
+- Formato invalido: `FF5733` (sin #), `#GG5733` (letras invalidas)
+
+#### 4.3.4 Actualizar Color
+
+**Mutation:**
+```graphql
+mutation {
+  actualizarColor(id: "uuid-del-color", input: {
+    nombre: "Rojo Intenso"
+    codigoHex: "#FF0000"
+  }) {
+    id
+    nombre
+    codigoHex
+  }
+}
+```
+
+#### 4.3.5 Eliminar Color
+
+**Mutation:**
+```graphql
+mutation {
+  eliminarColor(id: "uuid-del-color")
+}
+```
+
+---
+
+### 4.4 TALLAS
+
+#### 4.4.1 Listar Tallas
+
+**Query:**
+```graphql
+query {
+  getTallas {
+    id
+    nombre
+    medida
+    activo
+    createdAt
+  }
+}
+```
+
+**Permisos:** Publico
+
+#### 4.4.2 Obtener Talla por ID
+
+**Query:**
+```graphql
+query {
+  getTalla(id: "uuid-de-la-talla") {
+    id
+    nombre
+    medida
+    activo
+  }
+}
+```
+
+#### 4.4.3 Crear Talla
+
+**Mutation:**
+```graphql
+mutation {
+  crearTalla(input: {
+    nombre: "M"
+    medida: "38-40"
+    activo: true
+  }) {
+    id
+    nombre
+    medida
+    activo
+  }
+}
+```
+
+**Validaciones:**
+- Nombre: 1-10 caracteres (requerido, unico)
+- Medida: maximo 20 caracteres (opcional)
+- Activo: booleano (opcional, default: true)
+
+**Ejemplos comunes:**
+- Letras: S, M, L, XL, XXL
+- Numeros: 36, 38, 40, 42
+- Numeros USA: 6, 8, 10, 12
+
+#### 4.4.4 Actualizar Talla
+
+**Mutation:**
+```graphql
+mutation {
+  actualizarTalla(id: "uuid-de-la-talla", input: {
+    nombre: "L"
+    medida: "42-44"
+  }) {
+    id
+    nombre
+    medida
+  }
+}
+```
+
+#### 4.4.5 Eliminar Talla
+
+**Mutation:**
+```graphql
+mutation {
+  eliminarTalla(id: "uuid-de-la-talla")
+}
+```
+
+---
+
+### 4.5 DESCUENTOS
+
+#### 4.5.1 Listar Descuentos
+
+**Query:**
+```graphql
+query {
+  getDescuentos {
+    id
+    nombre
+    porcentaje
+    fechaInicio
+    fechaFin
+    activo
+    createdAt
+  }
+}
+```
+
+**Permisos:** Publico
+
+#### 4.5.2 Obtener Descuento por ID
+
+**Query:**
+```graphql
+query {
+  getDescuento(id: "uuid-del-descuento") {
+    id
+    nombre
+    porcentaje
+    fechaInicio
+    fechaFin
+    activo
+    productos {
+      id
+      nombre
+      precio
+    }
+  }
+}
+```
+
+#### 4.5.3 Crear Descuento
+
+**Mutation:**
+```graphql
+mutation {
+  crearDescuento(input: {
+    nombre: "Descuento de Verano"
+    porcentaje: 15.5
+    fechaInicio: "2025-06-01"
+    fechaFin: "2025-08-31"
+    activo: true
+  }) {
+    id
+    nombre
+    porcentaje
+    fechaInicio
+    fechaFin
+    activo
+  }
+}
+```
+
+**Validaciones:**
+- Nombre: 3-100 caracteres (requerido)
+- Porcentaje: 0.01-100 (requerido)
+- fechaInicio: formato YYYY-MM-DD (requerido)
+- fechaFin: formato YYYY-MM-DD (requerido, debe ser posterior a fechaInicio)
+- Activo: booleano (opcional, default: true)
+
+#### 4.5.4 Actualizar Descuento
+
+**Mutation:**
+```graphql
+mutation {
+  actualizarDescuento(id: "uuid-del-descuento", input: {
+    nombre: "Super Descuento de Verano"
+    porcentaje: 20.0
+    activo: false
+  }) {
+    id
+    nombre
+    porcentaje
+    activo
+  }
+}
+```
+
+#### 4.5.5 Eliminar Descuento
+
+**Mutation:**
+```graphql
+mutation {
+  eliminarDescuento(id: "uuid-del-descuento")
+}
+```
+
+---
+
+### 4.6 CATEGORIAS DE COLORES
+
+#### 4.6.1 Listar Categorias de Colores
+
+**Query:**
+```graphql
+query {
+  getCategoriasColores {
+    id
+    nombre
+    descripcion
+    activo
+    colores {
+      id
+      nombre
+      codigoHex
+    }
+    createdAt
+  }
+}
+```
+
+**Permisos:** Publico
+
+#### 4.6.2 Obtener Categoria de Color por ID
+
+**Query:**
+```graphql
+query {
+  getCategoriaColor(id: "uuid-de-la-categoria-color") {
+    id
+    nombre
+    descripcion
+    activo
+    colores {
+      id
+      nombre
+      codigoHex
+    }
+  }
+}
+```
+
+#### 4.6.3 Crear Categoria de Color
+
+**Mutation:**
+```graphql
+mutation {
+  crearCategoriaColor(input: {
+    nombre: "Colores Calidos"
+    descripcion: "Colores con tonos calidos como rojo, naranja, amarillo"
+    coloresIds: ["uuid-color-1", "uuid-color-2", "uuid-color-3"]
+    activo: true
+  }) {
+    id
+    nombre
+    descripcion
+    activo
+    colores {
+      id
+      nombre
+      codigoHex
+    }
+  }
+}
+```
+
+**Validaciones:**
+- Nombre: 2-100 caracteres (requerido, unico)
+- Descripcion: maximo 500 caracteres (opcional)
+- coloresIds: array de UUIDs validos (opcional)
+- Activo: booleano (opcional, default: true)
+
+**Nota:** Los colores deben existir previamente
+
+#### 4.6.4 Actualizar Categoria de Color
+
+**Mutation:**
+```graphql
+mutation {
+  actualizarCategoriaColor(id: "uuid-de-la-categoria-color", input: {
+    nombre: "Tonos Calidos"
+    coloresIds: ["uuid-color-4", "uuid-color-5"]
+  }) {
+    id
+    nombre
+    colores {
+      id
+      nombre
+    }
+  }
+}
+```
+
+#### 4.6.5 Eliminar Categoria de Color
+
+**Mutation:**
+```graphql
+mutation {
+  eliminarCategoriaColor(id: "uuid-de-la-categoria-color")
+}
+```
+
+---
+
+## 5. GESTION DE ORDENES
+
+### 5.1 Crear Orden
 
 **Mutation:**
 ```graphql
@@ -609,9 +1337,9 @@ mutation {
 
 ---
 
-## 5. PAGINACION Y FILTROS
+## 6. PAGINACION Y FILTROS
 
-### 5.1 Productos Paginados
+### 6.1 Productos Paginados
 
 **Query:**
 ```graphql
@@ -663,7 +1391,7 @@ query {
 
 **Campos ordenables:** nombre, precio, stock, categoria, createdAt
 
-### 5.2 Mis Ordenes Paginadas
+### 6.2 Mis Ordenes Paginadas
 
 **Query:**
 ```graphql
@@ -717,7 +1445,7 @@ query {
 
 **Permisos:** Usuario autenticado (solo ve sus ordenes)
 
-### 5.3 Todas las Ordenes Paginadas (Admin)
+### 6.3 Todas las Ordenes Paginadas (Admin)
 
 **Query:**
 ```graphql
@@ -757,9 +1485,9 @@ query {
 
 ---
 
-## 6. VALIDACIONES
+## 7. VALIDACIONES
 
-### 6.1 Validaciones de Registro
+### 7.1 Validaciones de Registro
 
 **Caso 1: Email invalido**
 ```graphql
@@ -806,7 +1534,7 @@ mutation {
 
 **Error esperado:** "El nombre debe tener al menos 2 caracteres"
 
-### 6.2 Validaciones de Productos
+### 7.2 Validaciones de Productos
 
 **Caso 1: Precio negativo**
 ```graphql
@@ -840,7 +1568,7 @@ mutation {
 
 **Error esperado:** "La descripcion debe tener al menos 10 caracteres"
 
-### 6.3 Validaciones de Ordenes
+### 7.3 Validaciones de Ordenes
 
 **Caso 1: Sin items**
 ```graphql
@@ -875,9 +1603,9 @@ mutation {
 
 ---
 
-## 7. CASOS DE PRUEBA COMPLETOS
+## 8. CASOS DE PRUEBA COMPLETOS
 
-### 7.1 Flujo Completo de Cliente
+### 8.1 Flujo Completo de Cliente
 
 **Paso 1: Registrarse**
 ```graphql
@@ -983,7 +1711,7 @@ mutation {
 
 Verificar: nombre actualizado correctamente
 
-### 7.2 Flujo Completo de Admin
+### 8.2 Flujo Completo de Admin
 
 **Paso 1: Login como admin**
 ```graphql
@@ -1074,7 +1802,7 @@ mutation {
 
 Verificar: estado y numero de seguimiento actualizados
 
-### 7.3 Prueba de Paginacion
+### 8.3 Prueba de Paginacion
 
 **Paso 1: Crear multiples productos (10+)**
 
@@ -1178,7 +1906,7 @@ query {
 
 Verificar: todos los items contienen "producto" en nombre o descripcion
 
-### 7.4 Prueba de Stock
+### 8.4 Prueba de Stock
 
 **Paso 1: Crear producto con stock limitado**
 ```graphql
@@ -1242,7 +1970,7 @@ mutation {
 
 **Error esperado:** "Stock insuficiente para Producto Stock Test. Disponible: 2"
 
-### 7.5 Prueba de Calculos de Orden
+### 8.5 Prueba de Calculos de Orden
 
 **Caso 1: Orden pequena (con envio)**
 
@@ -1271,9 +1999,9 @@ Total: $105.20
 
 ---
 
-## 8. MATRIZ DE PERMISOS
+## 9. MATRIZ DE PERMISOS
 
-### 8.1 Autenticacion
+### 9.1 Autenticacion
 
 | Operacion | Anonimo | Cliente | Admin |
 |-----------|---------|---------|-------|
@@ -1281,7 +2009,7 @@ Total: $105.20
 | login     | Si      | Si      | Si    |
 | me        | No      | Si      | Si    |
 
-### 8.2 Usuarios
+### 9.2 Usuarios
 
 | Operacion | Anonimo | Cliente | Admin |
 |-----------|---------|---------|-------|
@@ -1293,7 +2021,7 @@ Total: $105.20
 | cambiarRolUsuario | No | No | Si |
 | eliminarUsuario | No | No | Si |
 
-### 8.3 Productos
+### 9.3 Productos
 
 | Operacion | Anonimo | Cliente | Admin |
 |-----------|---------|---------|-------|
@@ -1304,7 +2032,44 @@ Total: $105.20
 | updateProduct | No | Si | Si |
 | deleteProduct | No | Si | Si |
 
-### 8.4 Ordenes
+### 9.4 Catalogo
+
+| Operacion | Anonimo | Cliente | Admin |
+|-----------|---------|---------|-------|
+| getCategorias | Si | Si | Si |
+| getCategoria(id) | Si | Si | Si |
+| crearCategoria | No | No | No |
+| actualizarCategoria | No | No | No |
+| eliminarCategoria | No | No | No |
+| getMarcas | Si | Si | Si |
+| getMarca(id) | Si | Si | Si |
+| crearMarca | No | No | No |
+| actualizarMarca | No | No | No |
+| eliminarMarca | No | No | No |
+| getColores | Si | Si | Si |
+| getColor(id) | Si | Si | Si |
+| crearColor | No | No | No |
+| actualizarColor | No | No | No |
+| eliminarColor | No | No | No |
+| getTallas | Si | Si | Si |
+| getTalla(id) | Si | Si | Si |
+| crearTalla | No | No | No |
+| actualizarTalla | No | No | No |
+| eliminarTalla | No | No | No |
+| getDescuentos | Si | Si | Si |
+| getDescuento(id) | Si | Si | Si |
+| crearDescuento | No | No | No |
+| actualizarDescuento | No | No | No |
+| eliminarDescuento | No | No | No |
+| getCategoriasColores | Si | Si | Si |
+| getCategoriaColor(id) | Si | Si | Si |
+| crearCategoriaColor | No | No | No |
+| actualizarCategoriaColor | No | No | No |
+| eliminarCategoriaColor | No | No | No |
+
+**Nota:** Todas las operaciones del catálogo son públicas para consulta. Las operaciones de creación, actualización y eliminación no están protegidas actualmente, pero se recomienda agregar autenticación de administrador.
+
+### 9.5 Ordenes
 
 | Operacion | Anonimo | Cliente | Admin |
 |-----------|---------|---------|-------|
