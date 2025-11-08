@@ -13,6 +13,7 @@ import { BusquedasModule } from './modules/busquedas/busquedas.module';
 import { NotasIngresoModule } from './modules/notas-ingreso/notas-ingreso.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { NotasVentaModule } from './modules/notas-venta/notas-venta.module';
+import { CartModule } from './modules/cart/cart.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { NotasVentaModule } from './modules/notas-venta/notas-venta.module';
     NotasIngresoModule,
     RolesModule,
     NotasVentaModule,
+    CartModule,
   ],
 })
 export class AppModule {}
