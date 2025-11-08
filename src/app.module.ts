@@ -12,6 +12,7 @@ import { CatalogModule } from './modules/catalog/catalog.module';
 import { BusquedasModule } from './modules/busquedas/busquedas.module';
 import { NotasIngresoModule } from './modules/notas-ingreso/notas-ingreso.module';
 import { RolesModule } from './modules/roles/roles.module';
+import { NotasVentaModule } from './modules/notas-venta/notas-venta.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { RolesModule } from './modules/roles/roles.module';
     BusquedasModule,
     NotasIngresoModule,
     RolesModule,
+    NotasVentaModule,
   ],
 })
 export class AppModule {}
