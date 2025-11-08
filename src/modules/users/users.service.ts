@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../auth/entities/user.entity';
 import { UpdateUserInput, UpdateUserRoleInput } from './dto/update-user.input';
+import { Rol } from '../roles/entities/rol.entity';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -10,18 +11,24 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Rol)
+    private rolRepository: Repository<Rol>,
   ) {}
 
   // Obtener todos los usuarios (solo admin)
   async findAll(): Promise<User[]> {
     return this.userRepository.find({
+      relations: ['rol'],
       order: { createdAt: 'DESC' },
     });
   }
 
   // Obtener un usuario por ID
   async findOne(id: string): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository.findOne({ 
+      where: { id },
+      relations: ['rol'],
+    });
     if (!user) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
     }
@@ -59,7 +66,18 @@ export class UsersService {
   // Cambiar rol de usuario (solo admin)
   async updateRole(id: string, input: UpdateUserRoleInput): Promise<User> {
     const user = await this.findOne(id);
-    user.rol = input.rol;
+    
+    // Buscar el rol por ID
+    const rol = await this.rolRepository.findOne({ 
+      where: { id: input.rolId } 
+    });
+    
+    if (!rol) {
+      throw new NotFoundException(`Rol con ID ${input.rolId} no encontrado`);
+    }
+    
+    user.rol = rol;
+    user.rolNombre = rol.nombre; // Mantener sincronizado
     return this.userRepository.save(user);
   }
 

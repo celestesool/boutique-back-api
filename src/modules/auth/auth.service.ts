@@ -28,12 +28,12 @@ export class AuthService {
     // Hashear contraseña
     const hashedPassword = await bcrypt.hash(input.password, 10);
 
-    // Crear usuario
+    // Crear usuario (rol se asignará por defecto como 'cliente' en rolNombre)
     const user = this.userRepository.create({
       email: input.email,
       nombre: input.nombre,
       password: hashedPassword,
-      rol: 'cliente',
+      rolNombre: 'cliente', // Usar rolNombre en lugar de rol
       activo: true,
     });
 

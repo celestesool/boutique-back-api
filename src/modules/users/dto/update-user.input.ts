@@ -1,5 +1,5 @@
-import { InputType, Field } from '@nestjs/graphql';
-import { IsEmail, IsEnum, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { InputType, Field, ID } from '@nestjs/graphql';
+import { IsEmail, IsEnum, IsOptional, IsString, MaxLength, MinLength, IsUUID } from 'class-validator';
 
 export enum UserRole {
   CLIENTE = 'cliente',
@@ -30,7 +30,7 @@ export class UpdateUserInput {
 
 @InputType()
 export class UpdateUserRoleInput {
-  @Field(() => String)
-  @IsEnum(UserRole, { message: 'El rol debe ser "cliente" o "admin"' })
-  rol: UserRole;
+  @Field(() => ID)
+  @IsUUID('4', { message: 'El ID del rol debe ser un UUID válido' })
+  rolId: string;
 }

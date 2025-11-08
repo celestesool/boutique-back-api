@@ -43,6 +43,14 @@ export class UsersResolver {
     return this.usersService.findAll();
   }
 
+  // Query: Obtener todos los usuarios - alias para frontend (solo admin)
+  @Query(() => [User], { name: 'obtenerUsuarios' })
+  async obtenerUsuarios(@Context() context): Promise<User[]> {
+    const { rol } = this.extractUserFromContext(context);
+    this.verifyAdmin(rol);
+    return this.usersService.findAll();
+  }
+
   // Query: Obtener un usuario por ID (admin o el propio usuario)
   @Query(() => User, { name: 'usuario' })
   async getUser(
@@ -91,6 +99,18 @@ export class UsersResolver {
   // Mutation: Cambiar rol de usuario (solo admin)
   @Mutation(() => User)
   async cambiarRolUsuario(
+    @Args('id', { type: () => ID }) id: string,
+    @Args('input') input: UpdateUserRoleInput,
+    @Context() context,
+  ): Promise<User> {
+    const { rol } = this.extractUserFromContext(context);
+    this.verifyAdmin(rol);
+    return this.usersService.updateRole(id, input);
+  }
+
+  // Mutation: Asignar rol a usuario (alias para frontend - solo admin)
+  @Mutation(() => User, { name: 'asignarRoles' })
+  async asignarRoles(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateUserRoleInput,
     @Context() context,

@@ -35,7 +35,8 @@ export class OrdersResolver {
         throw new BadRequestException('User not found');
       }
 
-      return { id: user.id, rol: user.rol };
+      // Usar rolNombre o el nombre del rol desde la entidad
+      return { id: user.id, rol: user.rolNombre || user.rol?.nombre || 'cliente' };
     } catch (error) {
       throw new BadRequestException('Invalid token: ' + error.message);
     }
