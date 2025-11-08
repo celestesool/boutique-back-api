@@ -10,6 +10,8 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { UsersModule } from './modules/users/users.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
 import { BusquedasModule } from './modules/busquedas/busquedas.module';
+import { NotasIngresoModule } from './modules/notas-ingreso/notas-ingreso.module';
+import { RolesModule } from './modules/roles/roles.module';
 
 @Module({
   imports: [
@@ -42,6 +44,8 @@ import { BusquedasModule } from './modules/busquedas/busquedas.module';
     UsersModule,
     CatalogModule,
     BusquedasModule,
+    NotasIngresoModule,
+    RolesModule,
   ],
 })
 export class AppModule {}
