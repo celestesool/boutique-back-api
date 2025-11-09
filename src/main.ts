@@ -7,12 +7,7 @@ async function bootstrap() {
 
   // ✅ CONFIGURAR CORS - Permitir peticiones desde el frontend
   app.enableCors({
-    origin: [
-      'http://localhost:5173',
-      'http://localhost:3000',
-      'https://boutique-frontend-4l9w.vercel.app',
-      /\.vercel\.app$/
-    ],
+    origin:true,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
