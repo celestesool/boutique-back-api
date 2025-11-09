@@ -1,18 +1,18 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   // ✅ CONFIGURAR CORS - Permitir peticiones desde el frontend
   app.enableCors({
-    origin: ['http://localhost:5173', 'http://localhost:3000'], // Frontend URLs permitidas
+    origin: ['http://localhost:5173', 'http://localhost:3000', 'https://*.vercel.app'], // Frontend URLs permitidas
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
-  
+
   // Habilitar validaciones globales
   app.useGlobalPipes(
     new ValidationPipe({
@@ -21,7 +21,7 @@ async function bootstrap() {
       transform: true, // Transforma automáticamente los tipos
     }),
   );
-  
+
   const port = parseInt(process.env.PORT) || 3001;
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}/graphql`);
