@@ -15,6 +15,7 @@ import { RolesModule } from './modules/roles/roles.module';
 import { NotasVentaModule } from './modules/notas-venta/notas-venta.module';
 import { CartModule } from './modules/cart/cart.module';
 import { ReportesModule } from './modules/reportes/reportes.module';
+import { MLModule } from './ml/ml.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { ReportesModule } from './modules/reportes/reportes.module';
     NotasVentaModule,
     CartModule,
     ReportesModule,
+    MLModule,
   ],
 })
 export class AppModule {}

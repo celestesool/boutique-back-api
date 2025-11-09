@@ -88,4 +88,81 @@ export class ProductsResolver {
     await this.productsService.remove(id);
     return true;
   }
+
+  // ==================== 🚀 QUERIES ML PARA MOBILE ====================
+
+  /**
+   * 📸 BÚSQUEDA VISUAL: Usuario toma foto → Buscar productos similares
+   * USO MOBILE: Camera → Base64 → Este endpoint
+   */
+  @Query(() => [Product], { 
+    description: '🔍 Búsqueda visual: Sube una foto y encuentra productos similares (Pinterest-style)' 
+  })
+  async buscarProductosPorImagen(
+    @Args('imageBase64', { description: 'Imagen en formato base64' }) imageBase64: string,
+    @Args('limit', { nullable: true, defaultValue: 20 }) limit: number,
+  ): Promise<Product[]> {
+    return this.productsService.buscarPorImagen(imageBase64, limit);
+  }
+
+  /**
+   * 🎯 PRODUCTOS SIMILARES: "También te puede gustar"
+   * USO MOBILE: En detalle de producto, mostrar grid de similares
+   */
+  @Query(() => [Product], { 
+    description: '💡 Obtener productos visualmente similares (basado en ML)' 
+  })
+  async productosSimilares(
+    @Args('productId') productId: string,
+    @Args('limit', { nullable: true, defaultValue: 10 }) limit: number,
+  ): Promise<Product[]> {
+    return this.productsService.obtenerSimilares(productId, limit);
+  }
+
+  /**
+   * 💎 RECOMENDACIONES PERSONALIZADAS: "Para ti"
+   * USO MOBILE: Feed personalizado basado en historial del usuario
+   */
+  @Query(() => [Product], { 
+    description: '🎁 Recomendaciones personalizadas basadas en tu historial' 
+  })
+  async recomendacionesParaTi(
+    @Args('limit', { nullable: true, defaultValue: 10 }) limit: number,
+    @Context() context: any,
+  ): Promise<Product[]> {
+    const user = await this.extractUserFromContext(context);
+    return this.productsService.obtenerRecomendacionesUsuario(user.id, limit);
+  }
+
+  /**
+   * 👁️ REGISTRAR VISTA: Cuando usuario ve un producto
+   * USO MOBILE: Llamar automáticamente al abrir detalle del producto
+   */
+  @Mutation(() => Boolean, { 
+    description: '📊 Registrar que el usuario vio un producto (para mejorar recomendaciones)' 
+  })
+  async registrarVistaProducto(
+    @Args('productId') productId: string,
+    @Context() context: any,
+  ): Promise<boolean> {
+    const user = await this.extractUserFromContext(context);
+    await this.productsService.registrarInteraccion(user.id, productId, 'view');
+    return true;
+  }
+
+  /**
+   * ❤️ REGISTRAR LIKE: Cuando usuario da "me gusta"
+   * USO MOBILE: Botón de favoritos en card de producto
+   */
+  @Mutation(() => Boolean, { 
+    description: '❤️ Registrar like en un producto (mejora recomendaciones)' 
+  })
+  async darLikeProducto(
+    @Args('productId') productId: string,
+    @Context() context: any,
+  ): Promise<boolean> {
+    const user = await this.extractUserFromContext(context);
+    await this.productsService.registrarInteraccion(user.id, productId, 'like');
+    return true;
+  }
 }

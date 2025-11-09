@@ -12,6 +12,7 @@ import { Marca } from '../catalog/entities/marca.entity';
 import { Descuento } from '../catalog/entities/descuento.entity';
 import { Color } from '../catalog/entities/color.entity';
 import { Talla } from '../catalog/entities/talla.entity';
+import { MLService } from '../../ml/ml.service';
 
 @Injectable()
 export class ProductsService {
@@ -28,6 +29,7 @@ export class ProductsService {
     private colorRepository: Repository<Color>,
     @InjectRepository(Talla)
     private tallaRepository: Repository<Talla>,
+    private mlService: MLService,
   ) {}
 
   async findAll(): Promise<Product[]> {
@@ -146,6 +148,14 @@ export class ProductsService {
     }
 
     const saved = await this.productRepository.save(product);
+    
+    // 🚀 AUTO-CLASIFICACIÓN ML (Si tiene imagen)
+    if (saved.imagen_url) {
+      this.clasificarProductoAutomaticamente(saved.id, saved.imagen_url).catch(err => {
+        console.error(`Error clasificando producto ${saved.id}:`, err.message);
+      });
+    }
+    
     return this.findOne(saved.id);
   }
 
@@ -237,5 +247,135 @@ export class ProductsService {
     const product = await this.findOne(productId);
     product.stock += cantidad;
     await this.productRepository.save(product);
+  }
+
+  // ==================== 🚀 MÉTODOS ML ====================
+
+  /**
+   * 📸 AUTO-CLASIFICACIÓN: Clasificar imagen y guardar metadata ML
+   * Usado cuando se crea/actualiza un producto con imagen
+   */
+  private async clasificarProductoAutomaticamente(productId: string, imageUrl: string): Promise<void> {
+    try {
+      // Aquí deberías convertir la URL a base64
+      // Por ahora simulamos que la imagen ya está en base64
+      const imageBase64 = imageUrl; // TODO: Implementar conversión URL -> base64
+      
+      const clasificacion = await this.mlService.clasificarImagen(productId, imageBase64);
+      
+      if (clasificacion.success) {
+        await this.productRepository.update(productId, {
+          ml_tipo_prenda: clasificacion.tipo_prenda?.label,
+          ml_color_principal: clasificacion.color_principal?.label,
+          ml_estilo: clasificacion.estilo?.label,
+          ml_tipo_cuello: clasificacion.tipo_cuello?.label,
+          ml_tipo_manga: clasificacion.tipo_manga?.label,
+          ml_patron: clasificacion.patron?.label,
+          ml_confidence: clasificacion.tipo_prenda?.confidence * 100,
+          ml_clasificado_en: new Date(),
+        });
+      }
+    } catch (error) {
+      console.error(`Error en clasificación ML:`, error.message);
+    }
+  }
+
+  /**
+   * 🔍 BÚSQUEDA VISUAL: Encuentra productos similares por imagen
+   * Para apps móviles: Usuario toma foto → Backend busca similares
+   */
+  async buscarPorImagen(imageBase64: string, limit: number = 20): Promise<Product[]> {
+    try {
+      const resultado = await this.mlService.busquedaVisual(imageBase64, limit);
+      
+      if (resultado.results && resultado.results.length > 0) {
+        const productIds = resultado.results.map((r: any) => r.product_id);
+        
+        // Obtener productos desde la DB
+        const products = await this.productRepository.find({
+          where: { id: In(productIds) },
+          relations: ['categoriaRelacion', 'marca', 'colores', 'tallas'],
+        });
+        
+        // Ordenar por score de ML
+        const scoreMap = new Map<string, number>(
+          resultado.results.map((r: any) => [r.product_id, Number(r.similarity_score)])
+        );
+        return products.sort((a, b) => {
+          const scoreA = scoreMap.get(a.id) || 0;
+          const scoreB = scoreMap.get(b.id) || 0;
+          return scoreB - scoreA;
+        });
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Error en búsqueda visual:', error.message);
+      return [];
+    }
+  }
+
+  /**
+   * 🎯 PRODUCTOS SIMILARES: Encuentra productos visuales similares
+   * Para "También te puede gustar" en detalle de producto
+   */
+  async obtenerSimilares(productId: string, limit: number = 10): Promise<Product[]> {
+    try {
+      const resultado = await this.mlService.buscarSimilaresPorProducto(productId, limit);
+      
+      if (resultado.similar_products && resultado.similar_products.length > 0) {
+        const similarIds = resultado.similar_products.map((p: any) => p.product_id);
+        
+        const products = await this.productRepository.find({
+          where: { id: In(similarIds), activo: true },
+          relations: ['categoriaRelacion', 'marca', 'colores', 'tallas'],
+        });
+        
+        return products;
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Error obteniendo similares:', error.message);
+      return [];
+    }
+  }
+
+  /**
+   * 💡 RECOMENDACIONES PERSONALIZADAS: Basado en historial del usuario
+   * Para sección "Para ti" en la app móvil
+   */
+  async obtenerRecomendacionesUsuario(userId: string, limit: number = 10): Promise<Product[]> {
+    try {
+      const resultado = await this.mlService.recomendacionesPorUsuario(userId, limit);
+      
+      if (resultado.recommendations && resultado.recommendations.length > 0) {
+        const recommendedIds = resultado.recommendations.map((r: any) => r.product_id);
+        
+        const products = await this.productRepository.find({
+          where: { id: In(recommendedIds), activo: true, stock: Between(1, 999999) },
+          relations: ['categoriaRelacion', 'marca', 'descuento', 'colores', 'tallas'],
+        });
+        
+        return products;
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Error obteniendo recomendaciones:', error.message);
+      return [];
+    }
+  }
+
+  /**
+   * 🛒 REGISTRAR INTERACCIÓN: Para entrenar el modelo de recomendaciones
+   * Llamar cuando usuario: ve, hace click, agrega al carrito, compra, da like
+   */
+  async registrarInteraccion(userId: string, productId: string, tipo: 'view' | 'click' | 'cart' | 'purchase' | 'like'): Promise<void> {
+    try {
+      await this.mlService.registrarInteraccion(userId, productId, tipo);
+    } catch (error) {
+      console.error('Error registrando interacción:', error.message);
+    }
   }
 }

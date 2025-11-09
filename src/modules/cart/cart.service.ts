@@ -7,6 +7,7 @@ import { User } from '../auth/entities/user.entity';
 import { Product } from '../products/entities/product.entity';
 import { Descuento } from '../catalog/entities/descuento.entity';
 import { AddToCartInput, UpdateCartItemInput, ApplyDiscountInput, RemoveFromCartInput } from './dto/cart.input';
+import { MLService } from '../../ml/ml.service';
 
 @Injectable()
 export class CartService {
@@ -21,6 +22,7 @@ export class CartService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(Descuento)
     private readonly descuentoRepository: Repository<Descuento>,
+    private readonly mlService: MLService,
   ) {}
 
   // Obtener o crear carrito del usuario
@@ -100,6 +102,10 @@ export class CartService {
       });
       await this.cartItemRepository.save(nuevoItem);
     }
+
+    // 🚀 REGISTRAR INTERACCIÓN ML: Producto agregado al carrito
+    this.mlService.registrarInteraccion(input.usuarioId, input.productoId, 'cart')
+      .catch(err => console.error('Error registrando interacción ML:', err.message));
 
     return this.actualizarTotales(carrito.id);
   }
