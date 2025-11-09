@@ -8,7 +8,16 @@ async function bootstrap() {
   app.enableCors({
     origin: '*', // Permite solicitudes desde cualquier origen
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'apollo-require-preflight'],
+    exposedHeaders: ['Content-Type', 'Authorization'],
+  });
+
+  // Configurar headers adicionales para el playground
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, apollo-require-preflight');
+    next();
   });
 
   // Habilitar validaciones globales
