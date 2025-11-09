@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
+import { MLModule } from './ml/ml.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BusquedasModule } from './modules/busquedas/busquedas.module';
 import { CartModule } from './modules/cart/cart.module';
@@ -62,6 +63,7 @@ import { UsersModule } from './modules/users/users.module';
     NotasVentaModule,
     CartModule,
     ReportesModule,
+    MLModule,
   ],
 })
 export class AppModule { }

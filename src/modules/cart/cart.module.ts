@@ -7,6 +7,7 @@ import { CartItem } from './entities/cart-item.entity';
 import { User } from '../auth/entities/user.entity';
 import { Product } from '../products/entities/product.entity';
 import { Descuento } from '../catalog/entities/descuento.entity';
+import { MLModule } from '../../ml/ml.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { Descuento } from '../catalog/entities/descuento.entity';
       Product,
       Descuento,
     ]),
+    MLModule,
   ],
   providers: [CartService, CartResolver],
   exports: [CartService],
